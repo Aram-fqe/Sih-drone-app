@@ -1,11 +1,49 @@
+# Futuristic Home Dashboard UI
 
-  # Futuristic Home Dashboard UI
+A Flutter application for a futuristic home dashboard interface.
 
-  This is a code bundle for Futuristic Home Dashboard UI. The original project is available at https://www.figma.com/design/1Md6qdb2bQthp8QYPTbmlo/Futuristic-Home-Dashboard-UI.
+## Getting Started
 
-  ## Running the code
+### Prerequisites
+- Flutter SDK (latest stable version)
+- Dart SDK
+- Android Studio / VS Code
+- Android/iOS device or emulator
 
-  Run `npm i` to install the dependencies.
+### Installation
 
-  Run `npm run dev` to start the development server.
-  
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd Futuristic-Home-Dashboard-UI
+```
+
+2. Install dependencies:
+```bash
+flutter pub get
+```
+
+3. Run the app:
+```bash
+flutter run
+```
+
+### Build
+
+```bash
+# Android APK
+flutter build apk
+
+# iOS (macOS only)
+flutter build ios
+```
+
+## Project Structure
+
+```
+lib/
+├── main.dart          # App entry point
+├── screens/           # UI screens
+├── widgets/           # Reusable widgets
+└── models/            # Data models
+```
