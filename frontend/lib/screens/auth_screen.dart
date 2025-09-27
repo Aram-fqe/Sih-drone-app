@@ -357,47 +357,47 @@ class _AuthScreenState extends State<AuthScreen> {
         const SizedBox(height: 16),
 
         // Google Sign In
-        StyledButton(
-          onPressed: () {},
-          backgroundColor: Colors.transparent,
-          borderColor: widget.isDarkMode
-              ? const Color(0xFF3A3A3A)
-              : Colors.grey.shade300,
-          child: Container(
-            width: double.infinity,
-            height: 48,
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: widget.isDarkMode ? Colors.grey.shade700 : Colors.grey.shade200,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.g_mobiledata,
-                    size: 16,
-                    color: widget.isDarkMode ? Colors.grey.shade300 : Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Sign in with Google',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: widget.isDarkMode
-                        ? Colors.grey.shade300
-                        : Colors.grey.shade700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        // StyledButton(
+        //   onPressed: () {},
+        //   backgroundColor: Colors.transparent,
+        //   borderColor: widget.isDarkMode
+        //       ? const Color(0xFF3A3A3A)
+        //       : Colors.grey.shade300,
+        //   child: Container(
+        //     width: double.infinity,
+        //     height: 48,
+        //     alignment: Alignment.center,
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.center,
+        //       children: [
+        //         Container(
+        //           width: 24,
+        //           height: 24,
+        //           decoration: BoxDecoration(
+        //             color: widget.isDarkMode ? Colors.grey.shade700 : Colors.grey.shade200,
+        //             shape: BoxShape.circle,
+        //           ),
+        //           child: Icon(
+        //             Icons.g_mobiledata,
+        //             size: 16,
+        //             color: widget.isDarkMode ? Colors.grey.shade300 : Colors.grey.shade600,
+        //           ),
+        //         ),
+        //         const SizedBox(width: 8),
+        //        // Text(
+        //           // 'Sign in with Google',
+        //           // style: TextStyle(
+        //           //   fontSize: 16,
+        //           //   fontWeight: FontWeight.w500,
+        //           //   color: widget.isDarkMode
+        //           //       ? Colors.grey.shade300
+        //           //       : Colors.grey.shade700,
+        //           // ),
+        //         //),
+        //       ],
+        //     ),
+        //   ),
+        // ),
         const SizedBox(height: 24),
 
         // Links
