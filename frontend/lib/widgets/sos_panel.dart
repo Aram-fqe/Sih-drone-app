@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../services/emergency_service.dart';
 
 class SOSPanel extends StatefulWidget {
   final bool isDarkMode;
@@ -19,6 +21,8 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
   bool showConfirmation = false;
   bool gpsShared = false;
   bool showContacts = false;
+  bool _isCallingEmergency = false;
+  bool _isCallingOperational = false;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -55,17 +59,87 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  void handleHumanEmergency() {
+  Future<void> handleHumanEmergency() async {
     setState(() {
       selectedEmergency = 'human';
       gpsShared = true;
       showContacts = true;
+      _isCallingEmergency = true;
+    });
+
+    // Haptic feedback
+    HapticFeedback.heavyImpact();
+
+    try {
+      // Automatically call 112
+      bool success = await EmergencyService.makeEmergencyCall();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(success 
+              ? '🚨 Emergency call to 112 initiated' 
+              : '⚠️ Call failed - Emergency logged to system'),
+            backgroundColor: success ? Colors.green : Colors.orange,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('🚨 Emergency alert sent to backend'),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+
+    setState(() {
+      _isCallingEmergency = false;
     });
   }
 
-  void handleOperationalEmergency() {
+  Future<void> handleOperationalEmergency() async {
     setState(() {
       selectedEmergency = 'operational';
+      _isCallingOperational = true;
+    });
+
+    // Haptic feedback
+    HapticFeedback.heavyImpact();
+
+    try {
+      // Automatically call operational manager
+      bool success = await EmergencyService.makeOperationalCall();
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(success 
+              ? '📞 Calling Operational Manager...' 
+              : '⚠️ Call failed - Alert logged to system'),
+            backgroundColor: success ? Colors.orange : Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('📞 Operational alert sent to backend'),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+
+    setState(() {
+      _isCallingOperational = false;
     });
   }
 
@@ -87,6 +161,8 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
           selectedEmergency = null;
           gpsShared = false;
           showContacts = false;
+          _isCallingEmergency = false;
+          _isCallingOperational = false;
         });
       }
     });
@@ -190,7 +266,7 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                         children: [
                           // Human Emergency
                           GestureDetector(
-                            onTap: handleHumanEmergency,
+                            onTap: _isCallingEmergency ? null : handleHumanEmergency,
                             child: Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
@@ -209,16 +285,27 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                                       ]
                                     : null,
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
-                                  Icon(Icons.warning, color: Colors.white, size: 24),
+                                  _isCallingEmergency 
+                                    ? SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Icon(Icons.warning, color: Colors.white, size: 24),
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '🚨 Human Emergency',
+                                          _isCallingEmergency 
+                                            ? '📞 Calling 112...' 
+                                            : '🚨 Human Emergency',
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
@@ -226,7 +313,9 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                                           ),
                                         ),
                                         Text(
-                                          'Top Priority - Immediate Response',
+                                          _isCallingEmergency 
+                                            ? 'Emergency call in progress' 
+                                            : 'Top Priority - Immediate Response',
                                           style: TextStyle(
                                             color: Colors.white70,
                                             fontSize: 14,
@@ -252,6 +341,33 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                               ),
                               child: Column(
                                 children: [
+                                  // Emergency Call Status
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.phone, color: Colors.red, size: 16),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Emergency Call to 112 Initiated',
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Icon(Icons.check_circle, color: Colors.red, size: 16),
+                                      ],
+                                    ),
+                                  ),
+                                  
+                                  SizedBox(height: 8),
+                                  
                                   // GPS Status
                                   if (gpsShared)
                                     Container(
@@ -385,7 +501,7 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                           
                           // Operational Emergency
                           GestureDetector(
-                            onTap: handleOperationalEmergency,
+                            onTap: _isCallingOperational ? null : handleOperationalEmergency,
                             child: Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
@@ -404,16 +520,27 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                                       ]
                                     : null,
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
-                                  Icon(Icons.warning_amber, color: Colors.black, size: 24),
+                                  _isCallingOperational 
+                                    ? SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.black,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Icon(Icons.warning_amber, color: Colors.black, size: 24),
                                   SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '🛑 Operational Emergency',
+                                          _isCallingOperational 
+                                            ? '📞 Calling Manager...' 
+                                            : '🛑 Operational Emergency',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.bold,
@@ -421,7 +548,9 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                                           ),
                                         ),
                                         Text(
-                                          'Drone/Mission Critical Issue',
+                                          _isCallingOperational 
+                                            ? 'Connecting to +918000494294' 
+                                            : 'Drone/Mission Critical Issue',
                                           style: TextStyle(
                                             color: Colors.black87,
                                             fontSize: 14,
@@ -441,85 +570,95 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                             Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: Colors.yellow.shade50,
-                                border: Border.all(color: Colors.yellow.shade200, width: 2),
+                                color: Colors.orange.shade50,
+                                border: Border.all(color: Colors.orange.shade200, width: 2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Column(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(color: Colors.yellow.shade200),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: const Row(
-                                            children: [
-                                              Icon(Icons.refresh, color: Colors.blue, size: 16),
-                                              SizedBox(width: 8),
-                                              Text(
-                                                'Recall Drone',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black87,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Container(
-                                          padding: const EdgeInsets.all(12),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(color: Colors.yellow.shade200),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: const Row(
-                                            children: [
-                                              Icon(Icons.flight_land, color: Colors.red, size: 16),
-                                              SizedBox(width: 8),
-                                              Text(
-                                                'Emergency Land',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black87,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
+                                  // Operational Call Status
                                   Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.yellow.shade200),
+                                      color: Colors.orange.shade100,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
-                                    child: const Row(
+                                    child: Row(
                                       children: [
-                                        Icon(Icons.people, color: Colors.green, size: 16),
+                                        Icon(Icons.phone, color: Colors.orange, size: 16),
                                         SizedBox(width: 8),
                                         Text(
-                                          'Notify Team Members',
+                                          'Calling Operational Manager',
                                           style: TextStyle(
+                                            color: Colors.orange.shade800,
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.black87,
                                             fontSize: 14,
                                           ),
+                                        ),
+                                        Spacer(),
+                                        Icon(Icons.check_circle, color: Colors.orange, size: 16),
+                                      ],
+                                    ),
+                                  ),
+                                  
+                                  SizedBox(height: 8),
+                                  
+                                  // Contact Info
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.contact_phone, color: Colors.blue, size: 16),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          '+91 8000 494 294',
+                                          style: TextStyle(
+                                            color: Colors.blue.shade800,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Spacer(),
+                                        Text(
+                                          'Manager',
+                                          style: TextStyle(
+                                            color: Colors.blue.shade600,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  
+                                  const SizedBox(height: 12),
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.shade100,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '📞 Operational Support Alert',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.orange.shade800,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Operational Manager will be contacted immediately',
+                                          style: TextStyle(
+                                            color: Colors.orange.shade700,
+                                            fontSize: 12,
+                                          ),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),

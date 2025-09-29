@@ -1,42 +1,55 @@
-# Flutter Django Full Stack Mobile App
+# DroneOps Emergency System
 
-A full-stack mobile application built with Flutter frontend and Django REST API backend.
+Drone operations management system with integrated automatic emergency calling functionality.
 
-## Tech Stack
+## Features
 
-**Frontend:**
-- Flutter (Dart)
-- HTTP package for API calls
-- Provider/Bloc for state management
+### Core Drone Operations
+- **Mission Management**: Create, track, and manage drone missions
+- **Real-time Monitoring**: Live telemetry and GPS tracking
+- **Fleet Analytics**: Comprehensive reporting and statistics
+- **Multi-user Support**: Role-based access control
 
-**Backend:**
-- Django
-- Django REST Framework
-- SQLite/PostgreSQL database
+### Emergency Calling System
+- **Integrated SOS Button**: Red emergency button in top-right corner
+- **Automatic 112 Calling**: One-tap emergency calling to emergency services
+- **Location Sharing**: Automatically shares GPS location during emergency
+- **Call Logging**: All emergency calls logged to backend with timestamp and location
+- **Cross-platform**: Works on both Android and iOS
+- **Fallback System**: Even if call fails, emergency alert is sent to backend
 
 ## Project Structure
 
 ```
-project/
-├── flutter_app/          # Flutter mobile app
+NEW_SIH/
+├── frontend/           # Flutter mobile app
 │   ├── lib/
-│   ├── android/
-│   ├── ios/
+│   │   ├── main.dart
+│   │   ├── screens/
+│   │   │   ├── onboarding_screen.dart
+│   │   │   ├── auth_screen.dart
+│   │   │   ├── main_screen.dart
+│   │   │   ├── reports_screen.dart
+│   │   │   └── chatbot_screen.dart
+│   │   ├── widgets/
+│   │   │   └── sos_panel.dart      # Emergency SOS functionality
+│   │   ├── services/
+│   │   │   └── emergency_service.dart  # 112 calling service
+│   │   └── providers/
+│   │       └── app_state_provider.dart
+│   ├── android/        # Android configuration
+│   ├── ios/           # iOS configuration
 │   └── pubspec.yaml
-├── django_backend/       # Django API server
+├── backend/           # Django REST API
+│   ├── drone_backend/  # Main Django project
+│   ├── emergency_api/  # Emergency calling API
+│   ├── drone_app/     # Drone operations
+│   ├── fleet_app/     # Fleet management
+│   ├── auth_app/      # Authentication
 │   ├── manage.py
-│   ├── requirements.txt
-│   └── apps/
+│   └── requirements.txt
 └── README.md
 ```
-
-## Prerequisites
-
-- Flutter SDK (3.0+)
-- Python (3.8+)
-- Django (4.0+)
-- Android Studio/VS Code
-- Git
 
 ## Setup Instructions
 
@@ -44,14 +57,13 @@ project/
 
 1. Navigate to backend directory:
 ```bash
-cd django_backend
+cd backend
 ```
 
 2. Create virtual environment:
 ```bash
 python -m venv venv
 venv\Scripts\activate  # Windows
-source venv/bin/activate  # macOS/Linux
 ```
 
 3. Install dependencies:
@@ -65,21 +77,16 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-5. Create superuser:
-```bash
-python manage.py createsuperuser
-```
-
-6. Start development server:
+5. Start server:
 ```bash
 python manage.py runserver
 ```
 
 ### Frontend Setup (Flutter)
 
-1. Navigate to Flutter directory:
+1. Navigate to frontend directory:
 ```bash
-cd flutter_app
+cd frontend
 ```
 
 2. Install dependencies:
@@ -92,63 +99,80 @@ flutter pub get
 flutter run
 ```
 
+## How Emergency SOS Works
+
+1. **User clicks red SOS button** (top-right corner) → SOS panel opens
+2. **User selects "Human Emergency"** → App requests phone and location permissions
+3. **Location detected** → GPS coordinates captured automatically
+4. **Emergency call initiated** → App automatically dials 112 using native phone app
+5. **Call logged** → Success/failure status sent to backend with location data
+6. **Fallback protection** → If call fails, emergency alert still sent to backend
+7. **User feedback** → Success/failure notification displayed
+
+## Permissions Setup
+
+### Android (AndroidManifest.xml)
+```xml
+<uses-permission android:name="android.permission.CALL_PHONE" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+```
+
+### iOS (Info.plist)
+```xml
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>tel</string>
+</array>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Location needed for emergency calls</string>
+```
+
 ## API Endpoints
 
-- `GET /api/` - API root
-- `POST /api/auth/login/` - User login
-- `POST /api/auth/register/` - User registration
-- `GET /api/data/` - Get data
-- `POST /api/data/` - Create data
+### Drone Operations
+- `GET /api/missions/` - Get all missions
+- `POST /api/missions/` - Create new mission
+- `GET /api/fleet-stats/` - Get fleet statistics
+- `GET /api/reports/` - Get reports data
 
-## Features
+### Emergency System
+- `POST /api/emergency-calls/` - Log emergency call
+- `GET /api/call-history/` - Get call history
 
-- User authentication
-- CRUD operations
-- Real-time data sync
-- Responsive UI
-- Cross-platform support
+## Database Schema (SQLite)
 
-## Development
+**EmergencyCall Model:**
+- `phone_number` - Emergency number called
+- `call_success` - Whether call was successful
+- `timestamp` - When call was made
+- `latitude/longitude` - GPS coordinates
+- `user` - User who made the call (optional)
 
-### Running Tests
+## Testing Emergency System
 
-**Django:**
-```bash
-python manage.py test
-```
+1. **Test SOS panel**: Click red SOS button in app header
+2. **Test emergency call**: Select "Human Emergency" (will actually dial 112)
+3. **Test logging**: Check Django admin for call records
+4. **Test permissions**: Verify location and phone permissions work
+5. **Test fallback**: Deny phone permission, verify backend still receives alert
+6. **Test integration**: Ensure normal app flow still works (onboarding → auth → main)
 
-**Flutter:**
-```bash
-flutter test
-```
+## Security Notes
 
-### Building for Production
+- Emergency calls work even without user authentication
+- Location data is only collected during emergency situations
+- All emergency calls are logged for safety and reporting
+- App handles permission denials gracefully
 
-**Android APK:**
-```bash
-flutter build apk --release
-```
+## Production Deployment
 
-**iOS:**
-```bash
-flutter build ios --release
-```
-
-## Configuration
-
-1. Update API base URL in Flutter app
+1. Update `baseUrl` in `emergency_service.dart` to production server
 2. Configure Django settings for production
-3. Set up environment variables
-4. Configure database settings
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch
-3. Commit changes
-4. Push to branch
-5. Create Pull Request
+3. Set up proper SSL certificates
+4. Configure app store permissions and descriptions
+5. Test emergency calling functionality thoroughly
+6. Ensure compliance with emergency services regulations
 
 ## Contact
 
-For questions or support, contact Nexo
+For support or questions about the Emergency Caller Agent system.

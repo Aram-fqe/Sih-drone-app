@@ -1,21 +1,28 @@
-node_modules/
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
 .env
-dist/
-build/
-.vscode/
-.DS_Store
-npm-debug.log
-yarn-error.log
-.dart_tool/
-.idea/
-*.iml
-*.log
-coverage/
-android/
-ios/
-linux/
-macos/
-windows/
-_pycache_/
-*.pyc 
 
+# Flutter
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Virtual Environment
+venv/
+env/
