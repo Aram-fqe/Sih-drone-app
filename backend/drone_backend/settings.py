@@ -8,7 +8,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here'
 
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'ns2c9zrg-8000.inc1.devtunnels.ms', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -112,6 +112,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://ns2c9zrg-8000.inc1.devtunnels.ms",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True

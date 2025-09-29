@@ -23,6 +23,7 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
   bool showContacts = false;
   bool _isCallingEmergency = false;
   bool _isCallingOperational = false;
+  String? _callingNumber;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -143,6 +144,44 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
     });
   }
 
+  Future<void> handleIndividualCall(String number, String name) async {
+    setState(() {
+      _callingNumber = number;
+    });
+
+    HapticFeedback.heavyImpact();
+
+    try {
+      bool success = await EmergencyService.makeCall(number, 'individual_emergency');
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(success 
+              ? '📞 Calling $name ($number)...' 
+              : '⚠️ Call to $name failed - Alert logged'),
+            backgroundColor: success ? Colors.green : Colors.orange,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('📞 Alert for $name sent to backend'),
+            backgroundColor: Colors.blue,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+
+    setState(() {
+      _callingNumber = null;
+    });
+  }
+
   void handleSendSOS() {
     setState(() {
       showConfirmation = true;
@@ -163,6 +202,7 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
           showContacts = false;
           _isCallingEmergency = false;
           _isCallingOperational = false;
+          _callingNumber = null;
         });
       }
     });
@@ -197,9 +237,9 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
                     // Header
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -417,46 +457,62 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                                           childAspectRatio: constraints.maxWidth > 300 ? 2.5 : 4,
                                           mainAxisSpacing: 8,
                                           crossAxisSpacing: 8,
-                                          children: emergencyContacts.map((contact) => Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(color: Colors.red.shade200),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              contact['icon']!,
-                                              style: const TextStyle(fontSize: 16),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                          children: emergencyContacts.map((contact) => GestureDetector(
+                                            onTap: _callingNumber == contact['number'] ? null : () => handleIndividualCall(contact['number']!, contact['name']!),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                color: _callingNumber == contact['number'] ? Colors.blue.shade50 : Colors.white,
+                                                border: Border.all(
+                                                  color: _callingNumber == contact['number'] ? Colors.blue.shade300 : Colors.red.shade200,
+                                                  width: _callingNumber == contact['number'] ? 2 : 1,
+                                                ),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Row(
                                                 children: [
-                                                  Text(
-                                                    contact['name']!,
-                                                    style: const TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: Colors.black87,
-                                                    ),
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                  Text(
-                                                    contact['number']!,
-                                                    style: const TextStyle(
-                                                      fontSize: 10,
-                                                      color: Colors.blue,
+                                                  _callingNumber == contact['number']
+                                                    ? SizedBox(
+                                                        width: 16,
+                                                        height: 16,
+                                                        child: CircularProgressIndicator(
+                                                          color: Colors.blue,
+                                                          strokeWidth: 2,
+                                                        ),
+                                                      )
+                                                    : Text(
+                                                        contact['icon']!,
+                                                        style: const TextStyle(fontSize: 16),
+                                                      ),
+                                                  const SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          _callingNumber == contact['number'] ? 'Calling...' : contact['name']!,
+                                                          style: TextStyle(
+                                                            fontSize: 10,
+                                                            fontWeight: FontWeight.w500,
+                                                            color: _callingNumber == contact['number'] ? Colors.blue.shade700 : Colors.black87,
+                                                          ),
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                        Text(
+                                                          contact['number']!,
+                                                          style: TextStyle(
+                                                            fontSize: 10,
+                                                            color: _callingNumber == contact['number'] ? Colors.blue.shade600 : Colors.blue,
+                                                            fontWeight: _callingNumber == contact['number'] ? FontWeight.w500 : FontWeight.normal,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                             ),
-                                          ],
-                                        ),
                                           )).toList(),
                                         );
                                       },
@@ -763,7 +819,8 @@ class _SOSPanelState extends State<SOSPanel> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                  ],
+                    ],
+                  ),
                 ),
                 ),
               ),

@@ -6,8 +6,8 @@ import 'dart:convert';
 
 class EmergencyService {
   static const String emergencyNumber = '112';
-  static const String operationalNumber = '+918000494294';
-  static const String baseUrl = 'http://localhost:8000/api';
+  static const String operationalNumber = '8000494294';
+  static const String baseUrl = 'https://ns2c9zrg-8000.inc1.devtunnels.ms/api';
 
   static Future<bool> makeEmergencyCall() async {
     return await _makeCall(emergencyNumber, 'emergency');
@@ -15,6 +15,10 @@ class EmergencyService {
 
   static Future<bool> makeOperationalCall() async {
     return await _makeCall(operationalNumber, 'operational');
+  }
+
+  static Future<bool> makeCall(String phoneNumber, String callType) async {
+    return await _makeCall(phoneNumber, callType);
   }
 
   static Future<bool> _makeCall(String phoneNumber, String callType) async {

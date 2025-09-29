@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
+import '../widgets/sos_panel.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -13,6 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int currentSlide = 0;
+  bool _showSOSPanel = false;
 
   final List<Map<String, String>> slides = [
     {
@@ -48,148 +50,186 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: widget.isDarkMode 
-            ? null 
-            : const LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [Color(0xFFF8FAFC), Color(0xFFEFF6FF)],
-              ),
-        ),
-        color: widget.isDarkMode ? const Color(0xFF121212) : null,
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Image Section
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final maxWidth = constraints.maxWidth > 320 ? 320.0 : constraints.maxWidth;
-                        return Container(
-                          width: maxWidth,
-                          height: maxWidth * 0.8,
-                          margin: const EdgeInsets.only(bottom: 32),
-                          decoration: BoxDecoration(
-                            color: widget.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: _buildSlideContent(),
-                          ),
-                        );
-                      },
-                    ),
-
-                    // Text Content
-                    Text(
-                      slides[currentSlide]["title"]!,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: widget.isDarkMode ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      slides[currentSlide]["subtitle"]!,
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 1.5,
-                        color: widget.isDarkMode ? const Color(0xFFE0E0E0) : const Color(0xFF475569),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    if (currentSlide == 2) ...[
-                      const SizedBox(height: 16),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Read our Privacy Policy',
-                          style: TextStyle(
-                            fontSize: 14,
-                            decoration: TextDecoration.underline,
-                            color: widget.isDarkMode ? const Color(0xFFBB86FC) : const Color(0xFF2563EB),
-                          ),
-                        ),
-                      ),
-                    ],
-                    
-                    // Progress Dots
-                    const SizedBox(height: 32),
-                    Row(
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              gradient: widget.isDarkMode 
+                ? null 
+                : const LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [Color(0xFFF8FAFC), Color(0xFFEFF6FF)],
+                  ),
+            ),
+            color: widget.isDarkMode ? const Color(0xFF121212) : null,
+            child: SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        slides.length,
-                        (index) => Container(
-                          width: 8,
-                          height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: index == currentSlide
-                              ? widget.isDarkMode ? const Color(0xFFBB86FC) : const Color(0xFF2563EB)
-                              : widget.isDarkMode ? const Color(0xFF3A3A3A) : const Color(0xFFCBD5E1),
-                          ),
+                      children: [
+                        // Image Section
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final maxWidth = constraints.maxWidth > 320 ? 320.0 : constraints.maxWidth;
+                            return Container(
+                              width: maxWidth,
+                              height: maxWidth * 0.8,
+                              margin: const EdgeInsets.only(bottom: 32),
+                              decoration: BoxDecoration(
+                                color: widget.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: _buildSlideContent(),
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
 
-                    // Next Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: handleNext,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.isDarkMode 
-                            ? const Color(0xFFBB86FC)
-                            : const Color(0xFF0F172A),
-                          foregroundColor: widget.isDarkMode ? Colors.black : Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                        // Text Content
+                        Text(
+                          slides[currentSlide]["title"]!,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            color: widget.isDarkMode ? Colors.white : const Color(0xFF0F172A),
                           ),
-                          elevation: 0,
+                          textAlign: TextAlign.center,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              slides[currentSlide]["buttonText"]!,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                        const SizedBox(height: 16),
+                        Text(
+                          slides[currentSlide]["subtitle"]!,
+                          style: TextStyle(
+                            fontSize: 16,
+                            height: 1.5,
+                            color: widget.isDarkMode ? const Color(0xFFE0E0E0) : const Color(0xFF475569),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        if (currentSlide == 2) ...[
+                          const SizedBox(height: 16),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Read our Privacy Policy',
+                              style: TextStyle(
+                                fontSize: 14,
+                                decoration: TextDecoration.underline,
+                                color: widget.isDarkMode ? const Color(0xFFBB86FC) : const Color(0xFF2563EB),
                               ),
                             ),
-                            if (currentSlide < slides.length - 1) ...[
-                              const SizedBox(width: 8),
-                              const Icon(Icons.chevron_right, size: 20),
-                            ],
-                          ],
+                          ),
+                        ],
+                        
+                        // Progress Dots
+                        const SizedBox(height: 32),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            slides.length,
+                            (index) => Container(
+                              width: 8,
+                              height: 8,
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: index == currentSlide
+                                  ? widget.isDarkMode ? const Color(0xFFBB86FC) : const Color(0xFF2563EB)
+                                  : widget.isDarkMode ? const Color(0xFF3A3A3A) : const Color(0xFFCBD5E1),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 32),
+
+                        // Next Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: handleNext,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: widget.isDarkMode 
+                                ? const Color(0xFFBB86FC)
+                                : const Color(0xFF0F172A),
+                              foregroundColor: widget.isDarkMode ? Colors.black : Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  slides[currentSlide]["buttonText"]!,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                if (currentSlide < slides.length - 1) ...[
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.chevron_right, size: 20),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+          
+          // SOS Button
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 16,
+            right: 16,
+            child: GestureDetector(
+              onTap: () => setState(() => _showSOSPanel = true),
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade600,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.red.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.warning, color: Colors.white, size: 24),
+              ),
+            ),
+          ),
+          
+          // SOS Panel
+          if (_showSOSPanel)
+            Positioned.fill(
+              child: SOSPanel(
+                isDarkMode: widget.isDarkMode,
+                onClose: () => setState(() => _showSOSPanel = false),
+              ),
+            ),
+        ],
       ),
     );
   }

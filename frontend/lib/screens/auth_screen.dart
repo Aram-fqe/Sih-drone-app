@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/app_state_provider.dart';
 import '../services/auth_service.dart';
 import '../widgets/ui_components.dart';
+import '../widgets/sos_panel.dart';
 import 'signup_screen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -108,7 +109,13 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
 
             // SOS Panel
-            if (_showSOSPanel) _buildSOSPanel(),
+            if (_showSOSPanel)
+              Positioned.fill(
+                child: SOSPanel(
+                  isDarkMode: widget.isDarkMode,
+                  onClose: () => setState(() => _showSOSPanel = false),
+                ),
+              ),
           ],
         ),
       ),
@@ -447,105 +454,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
 
 
-  Widget _buildSOSPanel() {
-    return GestureDetector(
-      onTap: () => setState(() => _showSOSPanel = false),
-      child: Container(
-        color: Colors.black.withValues(alpha: 0.5),
-        child: Center(
-          child: Container(
-            margin: const EdgeInsets.all(24),
-            child: StyledCard(
-              backgroundColor: widget.isDarkMode
-                  ? const Color(0xFF1E1E1E)
-                  : Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade100,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.warning_amber_rounded,
-                        size: 32,
-                        color: Colors.red.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Emergency Quick Access',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: widget.isDarkMode ? Colors.white : Colors.grey.shade900,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'In critical situations, DroneOps provides immediate support. Access essential features swiftly to ensure rapid response and assistance.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: widget.isDarkMode
-                            ? const Color(0xFFE0E0E0)
-                            : Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    StyledButton(
-                      onPressed: () {},
-                      backgroundColor: Colors.red.shade600,
-                      child: Container(
-                        width: double.infinity,
-                        height: 48,
-                        alignment: Alignment.center,
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
-                            Text('Call for Drone Support', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    StyledButton(
-                      onPressed: () => setState(() => _showSOSPanel = false),
-                      backgroundColor: Colors.transparent,
-                      borderColor: widget.isDarkMode
-                          ? const Color(0xFF3A3A3A)
-                          : Colors.grey.shade300,
-                      child: Container(
-                        width: double.infinity,
-                        height: 48,
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: widget.isDarkMode
-                                ? Colors.grey.shade300
-                                : Colors.grey.shade700,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+
 
   @override
   void dispose() {

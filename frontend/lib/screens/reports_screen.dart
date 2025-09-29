@@ -17,10 +17,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
   String? selectedZone;
   Map<String, dynamic> fleetStats = {};
   bool isLoading = true;
+  Map<String, bool> _healthItemExpanded = {};
 
   @override
   void initState() {
     super.initState();
+    _healthItemExpanded = {
+      'operational': false,
+      'maintenance': false,
+      'repair': false,
+    };
     _loadFleetStatistics();
   }
 
@@ -338,6 +344,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   Widget _buildDeliveryChart() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final titleFontSize = screenWidth < 350 ? 14.0 : 16.0;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -369,14 +378,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     : const Color(0xFF10B981),
               ),
               const SizedBox(width: 8),
-              Text(
-                'Delivery Success Rate',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: widget.isDarkMode
-                      ? Colors.white
-                      : const Color(0xFF0F172A),
+              Expanded(
+                child: Text(
+                  'Delivery Success Rate',
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: widget.isDarkMode
+                        ? Colors.white
+                        : const Color(0xFF0F172A),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -394,6 +407,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   Widget _buildDroneUtilization() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final titleFontSize = screenWidth < 350 ? 14.0 : 16.0;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -425,14 +441,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     : const Color(0xFF3B82F6),
               ),
               const SizedBox(width: 8),
-              Text(
-                'Drone Utilization',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: widget.isDarkMode
-                      ? Colors.white
-                      : const Color(0xFF0F172A),
+              Expanded(
+                child: Text(
+                  'Drone Utilization',
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: widget.isDarkMode
+                        ? Colors.white
+                        : const Color(0xFF0F172A),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -450,6 +470,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   Widget _buildResponseTimeChart() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final titleFontSize = screenWidth < 350 ? 14.0 : 16.0;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -481,14 +504,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     : const Color(0xFFF59E0B),
               ),
               const SizedBox(width: 8),
-              Text(
-                'Response Time Trend',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: widget.isDarkMode
-                      ? Colors.white
-                      : const Color(0xFF0F172A),
+              Expanded(
+                child: Text(
+                  'Response Time Trend',
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: widget.isDarkMode
+                        ? Colors.white
+                        : const Color(0xFF0F172A),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -621,6 +648,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
   // }
 
   Widget _buildMostDeliveredItems() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final titleFontSize = screenWidth < 350 ? 14.0 : 16.0;
+    final itemFontSize = screenWidth < 350 ? 13.0 : 15.0;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -642,24 +673,42 @@ class _ReportsScreenState extends State<ReportsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.local_shipping,
-                size: 20,
-                color: widget.isDarkMode
-                    ? const Color(0xFF03DAC6)
-                    : const Color(0xFF10B981),
+              Row(
+                children: [
+                  Icon(
+                    Icons.local_shipping,
+                    size: 20,
+                    color: widget.isDarkMode
+                        ? const Color(0xFF03DAC6)
+                        : const Color(0xFF10B981),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Most Delivered',
+                    style: TextStyle(
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w600,
+                      color: widget.isDarkMode
+                          ? Colors.white
+                          : const Color(0xFF0F172A),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Text(
-                'Most Delivered Items',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: widget.isDarkMode
-                      ? Colors.white
-                      : const Color(0xFF0F172A),
+              Padding(
+                padding: const EdgeInsets.only(left: 28),
+                child: Text(
+                  'Items',
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: widget.isDarkMode
+                        ? Colors.white
+                        : const Color(0xFF0F172A),
+                  ),
                 ),
               ),
             ],
@@ -672,22 +721,34 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          item['name'] as String,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: widget.isDarkMode
-                                ? Colors.white
-                                : const Color(0xFF0F172A),
+                        Expanded(
+                          flex: 3,
+                          child: Text(
+                            item['name'] as String,
+                            style: TextStyle(
+                              fontSize: itemFontSize,
+                              fontWeight: FontWeight.w500,
+                              color: widget.isDarkMode
+                                  ? Colors.white
+                                  : const Color(0xFF0F172A),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.visible,
                           ),
                         ),
-                        Text(
-                          '${item['count']}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: widget.isDarkMode
-                                ? const Color(0xFFB0B0B0)
-                                : const Color(0xFF6B7280),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            '${item['count']}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: widget.isDarkMode
+                                  ? const Color(0xFFB0B0B0)
+                                  : const Color(0xFF6B7280),
+                            ),
+                            textAlign: TextAlign.end,
                           ),
                         ),
                       ],
@@ -713,6 +774,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
   }
 
   Widget _buildDroneHealthSummary() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final titleFontSize = screenWidth < 350 ? 14.0 : 16.0;
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -744,25 +808,29 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     : const Color(0xFFF59E0B),
               ),
               const SizedBox(width: 8),
-              Text(
-                'Drone Health Summary',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: widget.isDarkMode
-                      ? Colors.white
-                      : const Color(0xFF0F172A),
+              Expanded(
+                child: Text(
+                  'Drone Health Summary',
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: widget.isDarkMode
+                        ? Colors.white
+                        : const Color(0xFF0F172A),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          _buildHealthItem('Operational', '8 drones', const Color(0xFF10B981)),
+          _buildHealthItem('Operational', '8 drones', const Color(0xFF10B981), 'operational'),
           const SizedBox(height: 12),
           _buildHealthItem(
-              'Maintenance Due', '3 drones', const Color(0xFFF59E0B)),
+              'Maintenance Due', '3 drones', const Color(0xFFF59E0B), 'maintenance'),
           const SizedBox(height: 12),
-          _buildHealthItem('Needs Repair', '1 drone', const Color(0xFFEF4444)),
+          _buildHealthItem('Needs Repair', '1 drone', const Color(0xFFEF4444), 'repair'),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.only(top: 12),
@@ -824,54 +892,60 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _buildHealthItem(String label, String value, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: widget.isDarkMode ? 0.2 : 0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+  Widget _buildHealthItem(String label, String value, Color color, String itemKey) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final labelFontSize = screenWidth < 350 ? 12.0 : 14.0;
+    final valueFontSize = screenWidth < 350 ? 11.0 : 13.0;
+    final isExpanded = _healthItemExpanded[itemKey] ?? false;
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _healthItemExpanded[itemKey] = !(_healthItemExpanded[itemKey] ?? false);
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: widget.isDarkMode ? 0.2 : 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
               ),
-              const SizedBox(width: 12),
-              Text(
-                label,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                isExpanded ? value : label,
                 style: TextStyle(
+                  fontSize: labelFontSize,
                   fontWeight: FontWeight.w500,
                   color: widget.isDarkMode
                       ? Colors.white
                       : const Color(0xFF0F172A),
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
-          Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: color,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildDeliveryBarChart() {
     final monthlyData = fleetStats['monthlyData'] as List? ?? [];
-    if (monthlyData.isEmpty)
+    if (monthlyData.isEmpty) {
       return const Center(child: Text('No data available'));
+    }
 
     return BarChart(
       BarChartData(
@@ -980,8 +1054,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   Widget _buildResponseTimeLineChart() {
     final monthlyData = fleetStats['monthlyData'] as List? ?? [];
-    if (monthlyData.isEmpty)
+    if (monthlyData.isEmpty) {
       return const Center(child: Text('No data available'));
+    }
 
     return LineChart(
       LineChartData(

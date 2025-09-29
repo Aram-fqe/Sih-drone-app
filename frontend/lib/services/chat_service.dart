@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ChatService {
-  static const String baseUrl = 'http://localhost:8000/api/chatbot';
+  static const String baseUrl = 'https://ns2c9zrg-8000.inc1.devtunnels.ms/api/chatbot';
   
   static String? _authToken;
   
