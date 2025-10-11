@@ -6,9 +6,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here')
 
-DEBUG = config('DEBUG', default=True, cast=bool)
+DEBUG=False
 
 ALLOWED_HOSTS = ['*', 'ns2c9zrg-8000.inc1.devtunnels.ms','sih-drone-app-production.up.railway.app', 'localhost']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://sih-drone-app-production.up.railway.app',
+    'https://*.up.railway.app',  # optional wildcard for Railway subdomains
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
