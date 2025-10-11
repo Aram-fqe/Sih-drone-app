@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class FleetStatisticsService {
-  static const String baseUrl = 'https://ns2c9zrg-8000.inc1.devtunnels.ms/api';
+  static const String baseUrl = 'https://sih-drone-app-production.up.railway.app/api';
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
   static Future<Map<String, String>> _getHeaders() async {

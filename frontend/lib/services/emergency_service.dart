@@ -7,7 +7,7 @@ import 'dart:convert';
 class EmergencyService {
   static const String emergencyNumber = '112';
   static const String operationalNumber = '8000494294';
-  static const String baseUrl = 'https://ns2c9zrg-8000.inc1.devtunnels.ms/api';
+  static const String baseUrl = 'https://sih-drone-app-production.up.railway.app/api';
 
   static Future<bool> makeEmergencyCall() async {
     return await _makeCall(emergencyNumber, 'emergency');

@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
-  static const String _baseUrl = 'https://ns2c9zrg-8000.inc1.devtunnels.ms'; // Use localhost
+  static const String _baseUrl = 'https://sih-drone-app-production.up.railway.app'; // Use localhost
   static const FlutterSecureStorage _storage = FlutterSecureStorage();
   
   final Dio _dio = Dio(BaseOptions(
