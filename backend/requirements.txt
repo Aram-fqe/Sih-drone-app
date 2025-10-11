@@ -5,3 +5,5 @@ djangorestframework_simplejwt==5.5.1
 python-decouple==3.8
 requests==2.32.5
 gunicorn
+django-cors-headers
+whitenoise>=6.5.0
